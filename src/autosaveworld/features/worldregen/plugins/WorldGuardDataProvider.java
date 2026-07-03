@@ -19,7 +19,8 @@ package autosaveworld.features.worldregen.plugins;
 
 import org.bukkit.World;
 
-import com.sk89q.worldguard.bukkit.WGBukkit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -31,15 +32,15 @@ public class WorldGuardDataProvider extends DataProvider {
 
 	@Override
 	protected void init() {
-		for (ProtectedRegion region : WGBukkit.getRegionManager(world).getRegions().values()) {
+		for (ProtectedRegion region : WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world)).getRegions().values()) {
 			if (region instanceof GlobalProtectedRegion) {
 				continue;
 			}
 			addChunksInBounds(
-				region.getMinimumPoint().getBlockX(),
-				region.getMinimumPoint().getBlockZ(),
-				region.getMaximumPoint().getBlockX(),
-				region.getMaximumPoint().getBlockZ()
+				region.getMinimumPoint().x(),
+				region.getMinimumPoint().z(),
+				region.getMaximumPoint().x(),
+				region.getMaximumPoint().z()
 			);
 		}
 	}

@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+}
+
+group = 'autosaveworld'
+version = '4.15'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+// Sources live directly under src/ (not the standard src/main/java layout),
+// so point Gradle at the existing layout instead of moving files around.
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src']
+            include 'plugin.yml'
+            include 'autosaveworld/config/localefiles/**/*.yml'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+
+    // Only needed to compile the vendored zlibs (Google API Client) code, which calls
+    // these classes directly. On the previous Ant build this resolved by accident via
+    // classes shaded into libs/paperspigot.jar; paper-api doesn't bundle them, and the
+    // real Paper/Spigot server runtime does, so compileOnly mirrors the runtime scope.
+    compileOnly 'com.google.guava:guava:33.3.1-jre'
+    compileOnly 'commons-codec:commons-codec:1.17.1'
+
+    // Soft dependencies: classes are only linked at runtime if the matching plugin is
+    // installed (see the `getPlugin(...) != null` checks before each purge/data provider
+    // is instantiated), so these stay compileOnly. Pulled in by file glob rather than a
+    // flatDir repo (deprecated, and libs/ jar filenames get swapped for newer builds
+    // e.g. FastAsyncWorldEdit/WorldGuard) - paperspigot.jar/purpur.jar are full server
+    // jars, not plugin API jars, so they're excluded in favor of the real paper-api above.
+    compileOnly fileTree(dir: 'libs', include: '*.jar', excludes: ['paperspigot.jar', 'purpur.jar'])
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('jar') {
+    archiveFileName = 'AutoSaveWorld.jar'
+    destinationDirectory = file('target')
+    from('LICENSE')
+}

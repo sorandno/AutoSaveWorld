@@ -3,6 +3,7 @@ main: autosaveworld.core.AutoSaveWorld
 version: 4.15
 author: _Shevchik_
 load: STARTUP
+api-version: '1.21'
 commands:
   autosaveworld:
     description: All AutoSaveWorld commands

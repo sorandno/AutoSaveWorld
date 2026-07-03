@@ -38,6 +38,7 @@ public class Threads {
 			run = false;
 		}
 
+		@SuppressWarnings("removal")
 		@Override
 		public void run() {
 			MessageLogger.debug(getName()+" started");

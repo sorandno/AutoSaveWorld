@@ -1,9 +1,8 @@
-# Build Folders #
-bin/
-build/
-target/
-.externalToolBuilders/
- # Eclipse Files #
-*.project
-*.classpath
-*.prefs
+# プロジェクトの除外パス
+/.git/
+/.claude/
+/.gradle/
+/.idea/
+/build/
+/参考資料/
+/参考/

@@ -33,14 +33,12 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
-import org.spigotmc.AsyncCatcher;
 
 import autosaveworld.commands.subcommands.StopCommand;
 import autosaveworld.core.AutoSaveWorld;
 import autosaveworld.core.logging.MessageLogger;
 import autosaveworld.utils.SchedulerUtils;
 import autosaveworld.utils.Threads.SIntervalTaskThread;
-import co.aikar.timings.MinecraftTimings;
 
 public class CrashRestartThread extends SIntervalTaskThread {
 
@@ -79,7 +77,7 @@ public class CrashRestartThread extends SIntervalTaskThread {
 		(diff >= AutoSaveWorld.getInstance().getMainConfig().restartOnCrashTimeout * 1000L);
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "removal" })
 	@Override
 	public void doTask() {
 		stopThread();
@@ -102,21 +100,14 @@ public class CrashRestartThread extends SIntervalTaskThread {
 
 		// make sure that we don't trigger restart twice
 		StopCommand.stop();
-		// freeze main thread
-		bukkitMainThread.suspend();
 		// kill main thread, so it will exit all monitors
 		// will have to attempt to kill it while it is still active because plugins code may catch throwables
-		while (bukkitMainThread.isAlive()) {
-			bukkitMainThread.stop();
-		}
-		// disable spigot async catcher
+		// Thread.suspend() was removed and Thread.stop() always throws UnsupportedOperationException
+		// on newer JDKs, so this is best-effort; don't let failure abort the rest of the shutdown sequence.
 		try {
-			AsyncCatcher.enabled = false;
-		} catch (Throwable t) {
-		}
-		// disable paper timings so async access doesn't print unneeded exceptions
-		try {
-			MinecraftTimings.stopServer();
+			while (bukkitMainThread.isAlive()) {
+				bukkitMainThread.stop();
+			}
 		} catch (Throwable t) {
 		}
 		log.log(Level.SEVERE, "Disabling plugins");
