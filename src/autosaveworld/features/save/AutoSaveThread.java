@@ -127,14 +127,23 @@ public class AutoSaveThread extends IntervalTaskThread {
 		MessageLogger.broadcast(AutoSaveWorld.getInstance().getMessageConfig().messageSaveBroadcastPost, AutoSaveWorld.getInstance().getMainConfig().saveBroadcast);
 	}
 
+	// saveLevel() is a CraftBukkit-era (pre-Mojang-mappings) internal method name that no
+	// longer exists on modern (Mojang-mapped) server versions. Once it fails once, stop
+	// retrying every save cycle instead of spamming the console with the same exception.
+	private static volatile boolean dumpRegionCacheSupported = true;
+
 	private void dumpRegionCache(World world) {
+		if (!dumpRegionCacheSupported) {
+			return;
+		}
 		if (world.isAutoSave()) {
 			try {
 				Object worldserver = getNMSWorld(world);
 				// invoke saveLevel method which waits for all chunks to save and than dumps RegionFileCache
 				ReflectionUtils.getMethod(worldserver.getClass(), NMSNames.getSaveLevelMethodName(), 0).invoke(worldserver);
 			} catch (Exception e) {
-				MessageLogger.exception("Could not dump RegionFileCache", e);
+				dumpRegionCacheSupported = false;
+				MessageLogger.debug("Could not dump RegionFileCache, this isn't supported on this server version - disabling it for this session");
 			}
 		}
 	}
