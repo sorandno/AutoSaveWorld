@@ -47,6 +47,8 @@ public class BukkitAPIWorldEditRegeneration implements WorldEditRegenrationInter
 	@Override
 	public void regenerateRegion(World world, BlockVector3 minpoint, BlockVector3 maxpoint) {
 		com.sk89q.worldedit.world.World wew = BukkitAdapter.adapt(world);
+		// 1.18以降はY=-64まで存在するため、0からではなく getMinHeight() から走査する
+		int miny = world.getMinHeight();
 		int maxy = world.getMaxHeight();
 		Region region = new CuboidRegion(wew, minpoint, maxpoint);
 		LinkedList<BlockToPlaceBack> placeBackQueue = new LinkedList<BlockToPlaceBack>();
@@ -60,7 +62,7 @@ public class BukkitAPIWorldEditRegeneration implements WorldEditRegenrationInter
 			for (BlockVector2 chunk : region.getChunks()) {
 				BlockVector3 min = BlockVector3.at(chunk.x() * 16, 0, chunk.z() * 16);
 				for (int x = 0; x < 16; ++x) {
-					for (int y = 0; y < maxy; ++y) {
+					for (int y = miny; y < maxy; ++y) {
 						for (int z = 0; z < 16; ++z) {
 							BlockVector3 pt = min.add(x, y, z);
 							if (!region.contains(pt)) {

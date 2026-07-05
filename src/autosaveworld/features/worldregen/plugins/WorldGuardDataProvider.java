@@ -21,6 +21,7 @@ import org.bukkit.World;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -32,7 +33,12 @@ public class WorldGuardDataProvider extends DataProvider {
 
 	@Override
 	protected void init() {
-		for (ProtectedRegion region : WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world)).getRegions().values()) {
+		RegionManager regionmanager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+		// リージョン機能が無効なワールドでは null が返る
+		if (regionmanager == null) {
+			return;
+		}
+		for (ProtectedRegion region : regionmanager.getRegions().values()) {
 			if (region instanceof GlobalProtectedRegion) {
 				continue;
 			}

@@ -47,6 +47,11 @@ public class WGPurge extends DataPurge {
 			for (World w : Bukkit.getWorlds()) {
 				MessageLogger.debug("Checking WG protections in world " + w.getName());
 				RegionManager regionmanager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+				// リージョン機能が無効なワールドでは null が返る
+				if (regionmanager == null) {
+					MessageLogger.debug("WG regions are not enabled in world " + w.getName() + ", skipping");
+					continue;
+				}
 				ArrayList<ProtectedRegion> regions = new ArrayList<ProtectedRegion>(regionmanager.getRegions().values());
 				for (ProtectedRegion rg : regions) {
 					MessageLogger.debug("Checking region " + rg.getId());
