@@ -1,4 +1,4 @@
-<project name="AutoSaveWorld" default="build" basedir=".">
+<project name="AutoSaveWorldFix" default="build" basedir=".">
 
 	<path id="libs">
 		<fileset dir="libs" includes="**/*.jar" />
@@ -17,7 +17,7 @@
 				<filename name="**/*.yml"/>
 			</fileset>
 		</copy>
-		<jar destfile="target/AutoSaveWorld.jar" basedir="build/classes" />
+		<jar destfile="target/AutoSaveWorldFix.jar" basedir="build/classes" />
 		<delete dir="build" />
 	</target>
 

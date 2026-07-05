@@ -55,7 +55,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('jar') {
-    archiveFileName = 'AutoSaveWorld.jar'
+    archiveFileName = 'AutoSaveWorldFix.jar'
     destinationDirectory = file('target')
     from('LICENSE')
 }
